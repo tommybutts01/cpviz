@@ -26,12 +26,12 @@ require_once 'graphviz/src/Alom/Graphviz/Subgraph.php';
 //$module_select = array();
 //global $active_modules;
 
-$action = isset($_POST['action']) ? $_POST['action'] : '';
-$extdisplay = isset($_POST['extdisplay']) ? $_POST['extdisplay'] : '';
-$iroute = isset($_POST['iroute']) ? $_POST['iroute'] : '';
+$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
+$extdisplay = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : '';
+$iroute = isset($_REQUEST['iroute']) ? $_REQUEST['iroute'] : '';
  
 $html_txt = '<div class="content">';
-$html_txt .= '<br><h2>'._("FreePBX Call Plan Vizualizer").'</h2>';
+$html_txt .= '<br><h2>'._("FreePBX Dial Plan Vizualizer").'</h2>';
 
 $full_list = framework_check_extension_usage(true);
 $full_list = is_array($full_list)?$full_list:array();
@@ -39,26 +39,24 @@ $full_list = is_array($full_list)?$full_list:array();
 // Get all AMPUSER settings
 // $ampuser = $astman->database_show("AMPUSER");
 // get all QUEUE settings
-$queuesetting = $astman->database_show("QUEUE");
+//$queuesetting = $astman->database_show("QUEUE");
 // $allsetting = $astman->database_show('');
 // $html_txt .= "<pre>\n" . "ALL settings: " . print_r($allsetting, true) .
 //              "\n</pre><br>\n";
 
-
 // Output a selector for the users to choose an inbound route
 $inroutes = dp_load_incoming_routes();
-
+//echo "<pre>";print_r($inroutes);echo "</pre>";
 $html_txt .= "<form name=\"routePrompt\" action=\"$_SERVER[PHP_SELF]\" method=\"POST\">\n";
 $html_txt .= "<input type=\"hidden\" name=\"display\" value=\"cpviz\">\n";
 $html_txt .= "Select an inbound route: ";
-$html_txt .= "<select name=\"iroute\">\n";
-$html_txt .= "<option value=\"None\">Select A Route</option>\n";
+$html_txt .= "<input list=\"nums\" value=\"$iroute\" name=\"iroute\">\n";
+$html_txt .= "<datalist id=\"nums\">\n";
 foreach ($inroutes as $ir) {
-  $s = ($ir['extension'] == $iroute) ? "selected" : "";
-  $html_txt .= "<option value=\"$ir[extension]\" $s>$ir[extension]</option>\n";
+  $html_txt .= "<option value=\"$ir[extension]\">$ir[extension]: $ir[description]</option>\n";
 }
-$html_txt .= "</select>\n";
-$html_txt .= "<input name=\"Submit\" type=\"submit\" value=\"Visualize Call Plan\">\n";
+$html_txt .= "</datalist>\n";
+$html_txt .= "<input name=\"Submit\" type=\"submit\" value=\"Visualize Dial Plan\">\n";
 $html_txt .= "</form>\n";
 $html_txt .= "<br>\n";
 
@@ -69,14 +67,14 @@ $html_txt .= "<br>\n";
 // happens, it looks ugly like something went really wrong.
 //$iroute = '5052327992';
 if ($iroute != '') {
-
+print_r($dproute);
   $dproute = dp_find_route($inroutes, $iroute);
   if (empty($dproute)) {
     $html_txt .= "<h2>Error: Could not find inbound route for '$iroute'</h2>\n";
     // ugh: throw new \InvalidArgumentException("Could not find and inbound route for '$iroute'");
   } else {
 
-    // $html_txt .= "<pre>\n" . "$iroute route: " . print_r($dproute, true) . "\n</pre><br>\n";
+    //$html_txt .= "<pre>\n" . "$iroute route: " . print_r($dproute, true) . "\n</pre><br>\n";
 
     dp_load_tables($dproute);   # adds data for time conditions, IVRs, etc.
     //$html_txt .= "<pre>\n" . "FreePBX config data: " . print_r($dproute, true) . "\n</pre><br>\n";
@@ -86,14 +84,14 @@ if ($iroute != '') {
     dplog(5, "Finished follow dest ...");
 
     $gtext = $dproute['dpgraph']->render();
-    // $html_txt .= "<pre>\n" . "Dial Plan Graph for $iroute:\n$gtext" . "\n</pre><br>\n";
+//  $html_txt .= "<pre>\n" . "Dial Plan Graph for formatPhoneNumber($iroute):\n$gtext" . "\n</pre><br>\n";
     dplog(5, "Dial Plan Graph for $iroute:\n$gtext");
     $gtext = preg_replace("/\n/", " ", $gtext);  // ugh, apparently viz chokes on newlines, wtf?
 
 
     $html_txt .= "<script src=\"modules/cpviz/viz.js\"></script>\n";
     $html_txt .= "<script src=\"modules/cpviz/full.render.js\"></script>\n";
-    $html_txt .= "<div id='vizContainer'><h1>Call Plan For Inbound Route $iroute</h1></div>\n";
+    $html_txt .= "<div id='vizContainer'><h1>Dial Plan For Inbound Route ".formatPhoneNumber($iroute).": ".$dproute['description']."</h1></div>\n";
     $html_txt .= "<script type=\"text/javascript\">\n";
     $html_txt .= "    var viz = new Viz();\n";
     // $html_txt .= " viz.renderSVGElement('$gtext')  \n";
@@ -108,4 +106,29 @@ if ($iroute != '') {
 }
 
 echo $html_txt."</div>";
+
+function formatPhoneNumber($phoneNumber) {
+    $phoneNumber = preg_replace('/[^0-9]/','',$phoneNumber);
+
+    if(strlen($phoneNumber) > 10) {
+        $countryCode = substr($phoneNumber, 0, strlen($phoneNumber)-10);
+        $areaCode = substr($phoneNumber, -10, 3);
+        $nextThree = substr($phoneNumber, -7, 3);
+        $lastFour = substr($phoneNumber, -4, 4);
+
+        $phoneNumber = '+'.$countryCode.' ('.$areaCode.') '.$nextThree.'-'.$lastFour;
+    }
+    else if(strlen($phoneNumber) == 10) {
+        $areaCode = substr($phoneNumber, 0, 3);
+        $nextThree = substr($phoneNumber, 3, 3);
+        $lastFour = substr($phoneNumber, 6, 4);
+
+        $phoneNumber = '('.$areaCode.') '.$nextThree.'-'.$lastFour;
+    }
+
+    return $phoneNumber;
+}
+
+
+
 ?>
