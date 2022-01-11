@@ -24,9 +24,9 @@ The cpviz module shows you a graph of the call flow for any Inbound Route.  End-
 
 The graph for that route should be displayed.  
 The graph is interractive.  
-Hovering over a path will highlight end to end. 
-Clicking on a destination will open it in a new tab. 
-Clicking on a Match: <timegroup> will open it in a new tab. 
+* Hovering over a path will highlight end to end. 
+* Clicking on a destination will open it in a new tab. 
+* Clicking on a Match: <timegroup> will open it in a new tab. 
 
 ### License
 [This modules code is licensed as GPLv3+](http://www.gnu.org/licenses/gpl-3.0.txt)
