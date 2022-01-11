@@ -21,9 +21,11 @@ The cpviz module shows you a graph of the call flow for any Inbound Route.  End-
 * Log in to your PBX, go to Reports > Dial Plan Visualizer
 * Select an inbound route from the drop-down menu
 * Click "Visualize Dial Plan"
-The graph for that route should be displayed.  The graph is
-not interractive, it is simply meant to provide a view
-of the Dial plan.
+
+The graph for that route should be displayed.  
+The graph is interractive, hovering over a path will highlight end to end.
+Clicking on a destination will open it in a new tab.
+Clicking on a Match: <timegroup> will open it in a new tab.
 
 ### License
 [This modules code is licensed as GPLv3+](http://www.gnu.org/licenses/gpl-3.0.txt)
