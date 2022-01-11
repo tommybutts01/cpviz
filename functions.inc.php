@@ -505,7 +505,7 @@ function dp_follow_destinations (&$route, $destination) {
 
   $node->attribute('label', 'Terminate Call: Hangup');
   $node->attribute('shape', 'invhouse');
-  $node->attribute('fillcolor', $neons[0]);
+  $node->attribute('fillcolor', 'orangered');
   $node->attribute('style', 'filled');
 
   #end of Blackhole - hangup
