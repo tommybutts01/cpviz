@@ -17,14 +17,6 @@ require_once 'graphviz/src/Alom/Graphviz/Digraph.php';
 require_once 'graphviz/src/Alom/Graphviz/AttributeSet.php';
 require_once 'graphviz/src/Alom/Graphviz/Subgraph.php';
 
-//$extension = _("Extension");
-//$vmxlocator = _("VmX Locator");
-//$followme   = _("Follow-Me");
-//$callstatus = _("Call status");
-//$status     =_("Status");
-//$html_txt_arr = array();
-//$module_select = array();
-//global $active_modules;
 
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
 $extdisplay = isset($_REQUEST['extdisplay']) ? $_REQUEST['extdisplay'] : '';
@@ -35,14 +27,6 @@ $html_txt .= '<br><h2>'._("FreePBX Dial Plan Vizualizer").'</h2>';
 
 $full_list = framework_check_extension_usage(true);
 $full_list = is_array($full_list)?$full_list:array();
-// Dont waste astman calls, get all family keys in one call
-// Get all AMPUSER settings
-// $ampuser = $astman->database_show("AMPUSER");
-// get all QUEUE settings
-//$queuesetting = $astman->database_show("QUEUE");
-// $allsetting = $astman->database_show('');
-// $html_txt .= "<pre>\n" . "ALL settings: " . print_r($allsetting, true) .
-//              "\n</pre><br>\n";
 
 // Output a selector for the users to choose an inbound route
 $inroutes = dp_load_incoming_routes();
@@ -94,9 +78,6 @@ print_r($dproute);
     $html_txt .= "<div id='vizContainer'><h1>Dial Plan For Inbound Route ".formatPhoneNumber($iroute).": ".$dproute['description']."</h1></div>\n";
     $html_txt .= "<script type=\"text/javascript\">\n";
     $html_txt .= "    var viz = new Viz();\n";
-    // $html_txt .= " viz.renderSVGElement('$gtext')  \n";
-    // $html_txt .= " viz.renderSVGElement('digraph { a -> b; }')  \n";
-    // $html_txt .= " viz.renderSVGElement('digraph 5052327992 { \"5052327992\" [label=\"5052327992\", style=filled, fillcolor=\"#7979FF\"]; }')  \n";
     $html_txt .= " viz.renderSVGElement('$gtext')  \n";
     $html_txt .= "   .then(function(element) {                 \n";
     $html_txt .= "     document.getElementById(\"vizContainer\").appendChild(element);   \n";
@@ -128,7 +109,4 @@ function formatPhoneNumber($phoneNumber) {
 
     return $phoneNumber;
 }
-
-
-
 ?>

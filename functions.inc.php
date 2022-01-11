@@ -2,7 +2,7 @@
 if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
 
 // Log Level: 0 = total quiet, 9 = much verbose
-$dp_log_level = 9;
+$dp_log_level = 6;
 
 // Set some colors
 $pastels[] = "#7979FF";
@@ -95,7 +95,7 @@ function dp_follow_destinations (&$route, $destination) {
     // UPDATE: beginNode() creates a node and returns it instead of
     // returning the graph.  Similarly for edge() and beginEdge().
     $route['parent_node'] = $dpgraph->get($route['extension']);
-    $route['parent_edge_label'] = 'Always';
+    $route['parent_edge_label'] = ' Always';
 
     # One of thse should work to set the root node, but neither does.
     # See: https://rt.cpan.org/Public/Bug/Display.html?id=101437
@@ -141,7 +141,7 @@ function dp_follow_destinations (&$route, $destination) {
 
   // dplog(9, "The Graph: " . print_r($dpgraph, true));
 
-// Now bail if we have already recursed on this destination before.
+  // Now bail if we have already recursed on this destination before.
   if ($node->getAttribute('label', 'NONE') != 'NONE') {
     return;
   }
@@ -167,10 +167,10 @@ function dp_follow_destinations (&$route, $destination) {
     # Not going to use the time group info for right now.  Maybe put it in the edge text?
     $tgname = $route['timegroups'][$tc['time']]['description'];
     $tgtime = $route['timegroups'][$tc['time']]['time'];
-    $tgnum= $route['timegroups'][$tc['time']]['id'];
+    $tgnum = $route['timegroups'][$tc['time']]['id'];
 
     # Now set the current node to be the parent and recurse on both the true and false branches
-    $route['parent_edge_label'] = 'Match: \\n'.$tgname.':\\n'.$tgtime;
+    $route['parent_edge_label'] = ' Match: \\n'.$tgname.':\\n'.$tgtime;
     $route['parent_edge_url'] = htmlentities('/admin/config.php?display=timegroups&view=form&extdisplay='.$tgnum);
     $route['parent_edge_target'] = '_blank';
 
@@ -178,7 +178,7 @@ function dp_follow_destinations (&$route, $destination) {
     dp_follow_destinations($route, $tc['truegoto']);
 
 
-    $route['parent_edge_label'] = 'NoMatch';
+    $route['parent_edge_label'] = ' NoMatch';
     $route['parent_edge_url'] ='';
     $route['parent_edge_target'] = '';
     $route['parent_node'] = $node;
@@ -203,7 +203,7 @@ function dp_follow_destinations (&$route, $destination) {
     # The destinations we need to follow are the queue members (extensions)
     # and the no-answer destination.
     if ($q['dest'] != '') {
-      $route['parent_edge_label'] = 'No Answer ('.$maxwait.')';
+      $route['parent_edge_label'] = ' No Answer ('.$maxwait.')';
       $route['parent_node'] = $node;
       dp_follow_destinations($route, $q['dest']);
     }
@@ -212,9 +212,9 @@ function dp_follow_destinations (&$route, $destination) {
     foreach ($q['members'] as $member => $qstatus) {
       dplog(9, "queue member $member / $qstatus ...");
       if ($qstatus == 'static') {
-        $route['parent_edge_label'] = 'Static Member';
+        $route['parent_edge_label'] = ' Static Member';
       } else {
-        $route['parent_edge_label'] = 'Dynamic Member';
+        $route['parent_edge_label'] = ' Dynamic Member';
       }
       $route['parent_node'] = $node;
       dp_follow_destinations($route, $member);
@@ -239,7 +239,6 @@ function dp_follow_destinations (&$route, $destination) {
     # The destinations we need to follow are the invalid_destination,
     # timeout_destination, and the selection targets
 
-//print_r($ivr);
 
   //are the invalid and timeout destinations the same?
   if ($ivr['invalid_destination']==$ivr['timeout_destination']){
@@ -287,14 +286,14 @@ function dp_follow_destinations (&$route, $destination) {
     # The destinations we need to follow are the no-answer destination
     # (postdest) and the members of the group.
     if ($rg['postdest'] != '') {
-      $route['parent_edge_label'] = 'No Answer ('.$rgmaxwait.')';
+      $route['parent_edge_label'] = ' No Answer ('.$rgmaxwait.')';
       $route['parent_node'] = $node;
       dp_follow_destinations($route, $rg['postdest']);
     }
 
     ksort($rg['members']);
     foreach ($rg['members'] as $member => $junk) {
-      $route['parent_edge_label'] = 'RG Member';
+      $route['parent_edge_label'] = ' RG Member';
       $route['parent_node'] = $node;
       if (preg_match("/^\d+/", $member)) {
         dp_follow_destinations($route, "Ext$member");
@@ -353,7 +352,7 @@ function dp_follow_destinations (&$route, $destination) {
   $node->attribute('style', 'filled');
 
   if ($cid['dest'] != '') {
-    $route['parent_edge_label'] = 'Continue';
+    $route['parent_edge_label'] = ' Continue';
     $route['parent_node'] = $node;
     dp_follow_destinations($route, $cid['dest']);
   }
@@ -511,12 +510,10 @@ function dp_follow_destinations (&$route, $destination) {
 
   #end of Blackhole - hangup
 
-//  include 'functions.custom.inc.php'; //custom configs go here
-
-
+  //preg_match not found
   } else {
     dplog(1, "Unknown destination type: $destination");
-    if ($route['parent_edge_label'] == 'Dynamic Member') {
+    if ($route['parent_edge_label'] == ' Dynamic Member') {
       $node->attribute('fillcolor', $neons[1]);
     } else {
       $node->attribute('fillcolor', $pastels[12]);
@@ -524,26 +521,8 @@ function dp_follow_destinations (&$route, $destination) {
     $node->attribute('style', 'filled');
   }
 
-#print "dpgraph: " . Dumper($dpgraph);
 }
 
-/*
-function dp_timecondition_str {
-  local($route, $num) = @_;
-
-  if (! defined $route->{timeconditions}->{$num}) {
-    return "TIME CONDITION NOT FOUND";
-  }
-
-  $tc = $route->{timeconditions}->{$num};
-  $tcname = $tc->{displayname};
-  $tcyes = $tc->{truegoto};
-  $tcno = $tc->{falsegoto};
-  $tgname = $route->{timegroups}->{$tc->{time}}->{description};
-  $tgtime = $route->{timegroups}->{$tc->{time}}->{time};
-  return "$tcname $tcyes $tcno $tgname $tgtime";
-}
-*/
 
 # load gobs of data.  Save it in hashrefs indexed by ints
 function dp_load_tables(&$dproute) {
@@ -622,11 +601,6 @@ function dp_load_tables(&$dproute) {
     }
   }
 
-/*
-  # Info about dynamic queue members is stored in AstDB, not mysql
-  &dp_load_dynamic_queue_members($dproute->{queues});
-*/
-
   # IVRs
   $query = "select * from ivr_details";
   $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
@@ -704,9 +678,7 @@ function dp_load_tables(&$dproute) {
   foreach($results as $miscdest) {
     $id = $miscdest['id'];
     $dproute['miscdest'][$id] = $miscdest;
-   // $dest = $miscdest['dest'];
     dplog(9, "miscdest dest: $id");
-   // $dproute['miscdest'][$id]['dest'] = $dest;
   }
 
   # Conferences (meetme)
@@ -718,9 +690,7 @@ function dp_load_tables(&$dproute) {
   foreach($results as $meetme) {
     $id = $meetme['exten'];
     $dproute['meetme'][$id] = $meetme;
-   // $dest = $meetme['dest'];
     dplog(9, "meetme dest:  conf=$id");
-   // $dproute['meetme'][$id]['dest'] = $dest;
   }
 
   # Directory
@@ -760,26 +730,6 @@ function dp_load_tables(&$dproute) {
 
 
 }
-
-/*
-function dp_load_dynamic_queue_members {
-  local($queues) = @_;
-  local($cmd, $qid, $ext);
-
-  $cmd = "/usr/sbin/asterisk -rx 'queue show'";
-  open(CMD, "$cmd |") || die "Can't run cmd '$cmd': $!\n";
-  while (<CMD>) {
-    if (/^(\d+) has \d+ calls/) {
-      $qid = $1;
-      dplog(9, "Dynamic queue $qid");
-    } elseif (/Local\/(\d+).*\(dynamic\)/) {
-      $ext = $1;
-      dplog(9, "Dynamic queue $qid, member $ext");
-      $queues->{$qid}->{members}->{"Ext$ext"} = 'dynamic';
-    }
-  }
-}
-*/
 
 function dplog($level, $msg) {
   global $dp_log_level;
