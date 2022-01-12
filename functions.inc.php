@@ -170,7 +170,7 @@ function dp_follow_destinations (&$route, $destination) {
     $tgnum = $route['timegroups'][$tc['time']]['id'];
 
     # Now set the current node to be the parent and recurse on both the true and false branches
-    $route['parent_edge_label'] = ' Match: \\n'.$tgname.':\\n'.$tgtime;
+    $route['parent_edge_label'] = 'Match: \\n'.$tgname.':\\n'.$tgtime;
     $route['parent_edge_url'] = htmlentities('/admin/config.php?display=timegroups&view=form&extdisplay='.$tgnum);
     $route['parent_edge_target'] = '_blank';
 
