@@ -28,7 +28,7 @@ $html_txt .= '<br><h2>'._("FreePBX Dial Plan Vizualizer").'</h2>';
 $full_list = framework_check_extension_usage(true);
 $full_list = is_array($full_list)?$full_list:array();
 
-// Output a selector for the users to choose an inbound route
+ // Output a selector for the users to choose an inbound route
 $inroutes = dp_load_incoming_routes();
 //echo "<pre>";print_r($inroutes);echo "</pre>";
 $html_txt .= "<form style=\"display: inline;\" name=\"routePrompt\" action=\"$_SERVER[PHP_SELF]\" method=\"POST\">\n";
