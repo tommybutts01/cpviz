@@ -34,7 +34,7 @@ $inroutes = dp_load_incoming_routes();
 $html_txt .= "<form style=\"display: inline;\" name=\"routePrompt\" action=\"$_SERVER[PHP_SELF]\" method=\"POST\">\n";
 $html_txt .= "<input type=\"hidden\" name=\"display\" value=\"cpviz\">\n";
 $html_txt .= "Select an inbound route: ";
-$html_txt .= "<input list=\"nums\" value=\"$iroute\" name=\"iroute\" onfocus=\"this.value=''\" onchange=\"this.blur();>\n";
+$html_txt .= "<input list=\"nums\" value=\"$iroute\" name=\"iroute\" onfocus=\"this.value=''\" onchange=\"this.blur();\">\n";
 $html_txt .= "<datalist id=\"nums\">\n";
 if ($inroutes){
 	foreach ($inroutes as $ir) {
