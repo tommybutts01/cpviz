@@ -36,8 +36,12 @@ $html_txt .= "<input type=\"hidden\" name=\"display\" value=\"cpviz\">\n";
 $html_txt .= "Select an inbound route: ";
 $html_txt .= "<input list=\"nums\" value=\"$iroute\" name=\"iroute\">\n";
 $html_txt .= "<datalist id=\"nums\">\n";
-foreach ($inroutes as $ir) {
-  $html_txt .= "<option value=\"$ir[extension]\">$ir[extension]: $ir[description]</option>\n";
+if ($inroutes){
+	foreach ($inroutes as $ir) {
+	  $html_txt .= "<option value=\"$ir[extension]\">$ir[extension]: $ir[description]</option>\n";
+	}
+}else{
+	$html_txt .= "<option>No Routes Found</option>\n";
 }
 $html_txt .= "</datalist>\n";
 $html_txt .= "<input name=\"Submit\" type=\"submit\" value=\"Visualize Dial Plan\">\n";
