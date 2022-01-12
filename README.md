@@ -27,6 +27,8 @@ The graph is interractive.
 * Hovering over a path will highlight end to end. 
 * Clicking on a destination will open it in a new tab. 
 * Clicking on a Match:(timegroup) will open it in a new tab. 
+* Added an "Export as ... .png" button
+
 
 ### License
 [This modules code is licensed as GPLv3+](http://www.gnu.org/licenses/gpl-3.0.txt)
