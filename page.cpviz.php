@@ -31,7 +31,7 @@ $full_list = is_array($full_list)?$full_list:array();
 // Output a selector for the users to choose an inbound route
 $inroutes = dp_load_incoming_routes();
 //echo "<pre>";print_r($inroutes);echo "</pre>";
-$html_txt .= "<form name=\"routePrompt\" action=\"$_SERVER[PHP_SELF]\" method=\"POST\">\n";
+$html_txt .= "<form style=\"display: inline;\" name=\"routePrompt\" action=\"$_SERVER[PHP_SELF]\" method=\"POST\">\n";
 $html_txt .= "<input type=\"hidden\" name=\"display\" value=\"cpviz\">\n";
 $html_txt .= "Select an inbound route: ";
 $html_txt .= "<input list=\"nums\" value=\"$iroute\" name=\"iroute\">\n";
@@ -46,8 +46,8 @@ if ($inroutes){
 $html_txt .= "</datalist>\n";
 $html_txt .= "<input name=\"Submit\" type=\"submit\" value=\"Visualize Dial Plan\">\n";
 $html_txt .= "</form>\n";
-$html_txt .= "<br>\n";
 
+//$graphPath="/tmp/graph.png";
 // Now, if $iroute is set, we will procede to display the call plan
 // graph for it.  If not, we would like to just bail, but I haven't
 // figured out how to do that in this framework.  If I exit() or 
@@ -72,6 +72,7 @@ print_r($dproute);
     dplog(5, "Finished follow dest ...");
 
     $gtext = $dproute['dpgraph']->render();
+	//file_put_contents($graphPath, $dproute['dpgraph']->fetch('png'));
 //  $html_txt .= "<pre>\n" . "Dial Plan Graph for formatPhoneNumber($iroute):\n$gtext" . "\n</pre><br>\n";
     dplog(5, "Dial Plan Graph for $iroute:\n$gtext");
     $gtext = preg_replace("/\n/", " ", $gtext);  // ugh, apparently viz chokes on newlines, wtf?
@@ -79,14 +80,38 @@ print_r($dproute);
 
     $html_txt .= "<script src=\"modules/cpviz/viz.js\"></script>\n";
     $html_txt .= "<script src=\"modules/cpviz/full.render.js\"></script>\n";
-    $html_txt .= "<div id='vizContainer'><h1>Dial Plan For Inbound Route ".formatPhoneNumber($iroute).": ".$dproute['description']."</h1></div>\n";
-    $html_txt .= "<script type=\"text/javascript\">\n";
+	$html_txt .= "<script src=\"modules/cpviz/html2canvas.js\"></script>\n";
+	$html_txt .= "<input type=\"button\" id=\"download\" value=\"Export as $iroute.png\">\n";
+	$html_txt .= "<br>\n";
+
+	$html_txt .= "<div id='vizContainer'><h1>Dial Plan For Inbound Route ".formatPhoneNumber($iroute).": ".$dproute['description']."</h1></div>\n";
+	$html_txt .= "<script type=\"text/javascript\">\n";
     $html_txt .= "    var viz = new Viz();\n";
     $html_txt .= " viz.renderSVGElement('$gtext')  \n";
     $html_txt .= "   .then(function(element) {                 \n";
     $html_txt .= "     document.getElementById(\"vizContainer\").appendChild(element);   \n";
     $html_txt .= "  });\n";
-    $html_txt .= "</script>\n";
+	$html_txt .= "document.getElementById(\"download\").addEventListener(\"click\", function() {
+					html2canvas(document.querySelector('#vizContainer')).then(function(canvas) {
+					saveAs(canvas.toDataURL(), '$iroute.png');
+						});
+					});
+					function saveAs(uri, filename) {
+						var link = document.createElement('a');
+						if (typeof link.download === 'string') {
+							link.href = uri;
+							link.download = filename;
+							//Firefox requires the link to be in the body
+							document.body.appendChild(link);
+							//simulate click
+							link.click();
+							//remove the link when done
+							document.body.removeChild(link);
+						} else {
+							window.open(uri);
+						}
+					}\n";
+	$html_txt .= "</script>\n";
   }
 }
 
