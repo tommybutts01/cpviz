@@ -81,7 +81,7 @@ print_r($dproute);
     $html_txt .= "<script src=\"modules/cpviz/full.render.js\"></script>\n";
     $html_txt .= "<script src=\"modules/cpviz/html2canvas.js\"></script>\n";
     $html_txt .= "<input type=\"button\" id=\"download\" value=\"Export as $iroute.png\">\n";
-    $html_txt .= "<br>\n";
+    $html_txt .= "<br><br>\n";
     $html_txt .= "<div id='vizContainer'><h1>Dial Plan For Inbound Route ".formatPhoneNumber($iroute).": ".$dproute['description']."</h1></div>\n";
     $html_txt .= "<script type=\"text/javascript\">\n";
     $html_txt .= "    var viz = new Viz();\n";
