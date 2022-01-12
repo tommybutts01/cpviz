@@ -77,21 +77,19 @@ print_r($dproute);
     dplog(5, "Dial Plan Graph for $iroute:\n$gtext");
     $gtext = preg_replace("/\n/", " ", $gtext);  // ugh, apparently viz chokes on newlines, wtf?
 
-
     $html_txt .= "<script src=\"modules/cpviz/viz.js\"></script>\n";
     $html_txt .= "<script src=\"modules/cpviz/full.render.js\"></script>\n";
-	$html_txt .= "<script src=\"modules/cpviz/html2canvas.js\"></script>\n";
-	$html_txt .= "<input type=\"button\" id=\"download\" value=\"Export as $iroute.png\">\n";
-	$html_txt .= "<br>\n";
-
-	$html_txt .= "<div id='vizContainer'><h1>Dial Plan For Inbound Route ".formatPhoneNumber($iroute).": ".$dproute['description']."</h1></div>\n";
-	$html_txt .= "<script type=\"text/javascript\">\n";
+    $html_txt .= "<script src=\"modules/cpviz/html2canvas.js\"></script>\n";
+    $html_txt .= "<input type=\"button\" id=\"download\" value=\"Export as $iroute.png\">\n";
+    $html_txt .= "<br>\n";
+    $html_txt .= "<div id='vizContainer'><h1>Dial Plan For Inbound Route ".formatPhoneNumber($iroute).": ".$dproute['description']."</h1></div>\n";
+    $html_txt .= "<script type=\"text/javascript\">\n";
     $html_txt .= "    var viz = new Viz();\n";
     $html_txt .= " viz.renderSVGElement('$gtext')  \n";
     $html_txt .= "   .then(function(element) {                 \n";
     $html_txt .= "     document.getElementById(\"vizContainer\").appendChild(element);   \n";
     $html_txt .= "  });\n";
-	$html_txt .= "document.getElementById(\"download\").addEventListener(\"click\", function() {
+    $html_txt .= "document.getElementById(\"download\").addEventListener(\"click\", function() {
 					html2canvas(document.querySelector('#vizContainer')).then(function(canvas) {
 					saveAs(canvas.toDataURL(), '$iroute.png');
 						});
