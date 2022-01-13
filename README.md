@@ -33,5 +33,7 @@ The graph is interractive.
 [This modules code is licensed as GPLv3+](http://www.gnu.org/licenses/gpl-3.0.txt)
 
 ### Issues
-* Duplicate paths are not noted on the edge text for IVRs. Selection 0, Timeout, Invalid = Operator Ring Group. Only 1 edge text is applied in this case.
+* Duplicate paths are not noted on the edge text for IVRs. 
+* Example: Timeout, Invalid, Selection 0 = Operator Ring Group. Only 1 edge text is applied in this case.
+
 Please file bug reports by email to adam.volchko@gmail.com
