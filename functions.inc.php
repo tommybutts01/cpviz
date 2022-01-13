@@ -119,7 +119,7 @@ function dp_follow_destinations (&$route, $destination) {
     dplog(7, "Adding node: $destination");
     $node = $dpgraph->beginNode($destination);
   }
-  
+ 
   // Add an edge from our parent to this node, if there is not already one.
   // We do this even if the node already existed because this node might
   // have several paths to reach it.
@@ -131,7 +131,7 @@ function dp_follow_destinations (&$route, $destination) {
     dplog(9, "NOT making an edge from $ptxt -> $ntxt");
   } else {
     dplog(9, "Making an edge from $ptxt -> $ntxt");
-    $edge = $dpgraph->beginEdge(array($route['parent_node'], $node));
+    $edge= $dpgraph->beginEdge(array($route['parent_node'], $node));
     $edge->attribute('label', $route['parent_edge_label']);
 	if (preg_match("/^(Match:)./", $route['parent_edge_label'])){
 		$edge->attribute('URL', $route['parent_edge_url']);
@@ -156,7 +156,7 @@ function dp_follow_destinations (&$route, $destination) {
     $tcother = $matches[2];
 
     $tc = $route['timeconditions'][$tcnum];
-    $node->attribute('label', "TC: $tc[displayname]");
+    $node->attribute('label', "TC: ".htmlspecialchars($tc[displayname],ENT_QUOTES));
     $node->attribute('URL', htmlentities('/admin/config.php?display=timeconditions&view=form&itemid='.$tcnum));
     $node->attribute('target', '_blank');
     $node->attribute('shape', 'invhouse');
@@ -170,7 +170,7 @@ function dp_follow_destinations (&$route, $destination) {
     $tgnum = $route['timegroups'][$tc['time']]['id'];
 
     # Now set the current node to be the parent and recurse on both the true and false branches
-    $route['parent_edge_label'] = 'Match: \\n'.$tgname.':\\n'.$tgtime;
+    $route['parent_edge_label'] = 'Match: \\n'.htmlspecialchars($tgname,ENT_QUOTES).':\\n'.$tgtime;
     $route['parent_edge_url'] = htmlentities('/admin/config.php?display=timegroups&view=form&extdisplay='.$tgnum);
     $route['parent_edge_target'] = '_blank';
 
@@ -193,7 +193,7 @@ function dp_follow_destinations (&$route, $destination) {
 
     $q = $route['queues'][$qnum];
     if ($q['maxwait']>=60){$maxwait=($q['maxwait'] / 60).' mins';}elseif($q['maxwait']==0){$maxwait='Unlimited';}else{$maxwait=$q['maxwait'].' secs';}
-    $node->attribute('label', "Queue $qnum: $q[descr]");
+    $node->attribute('label', "Queue $qnum: ".htmlspecialchars($q['descr'],ENT_QUOTES));
     $node->attribute('URL', htmlentities('/admin/config.php?display=queues&view=form&extdisplay='.$qnum));
     $node->attribute('target', '_blank');
     $node->attribute('shape', 'hexagon');
@@ -229,7 +229,7 @@ function dp_follow_destinations (&$route, $destination) {
     $iother = $matches[3];
 
     $ivr = $route['ivrs'][$inum];
-    $node->attribute('label', "IVR: $ivr[name]");
+    $node->attribute('label', "IVR: ".htmlspecialchars($ivr['name'], ENT_QUOTES));
     $node->attribute('URL', htmlentities('/admin/config.php?display=ivr&action=edit&id='.$inum));
     $node->attribute('target', '_blank');
     $node->attribute('shape', 'component');
@@ -262,7 +262,7 @@ function dp_follow_destinations (&$route, $destination) {
       ksort($ivr['entries']);
       foreach ($ivr['entries'] as $selid => $ent) {
         dplog(9, "ivr member $selid / $ent ...");
-        $route['parent_edge_label']= " Selection $ent[selection]";
+		$route['parent_edge_label']= " Selection $ent[selection]";
         $route['parent_node'] = $node;
         dp_follow_destinations($route, $ent['dest']);
       }
@@ -277,7 +277,7 @@ function dp_follow_destinations (&$route, $destination) {
 
     $rg = $route['ringgroups'][$rgnum];
     if ($rg['grptime']>=60){$rgmaxwait=($rg['grptime'] / 60).' mins';}else{$rgmaxwait=$rg['grptime'].' secs';}
-    $node->attribute('label', "Ring Group: $rgnum: $rg[description]");
+    $node->attribute('label', "Ring Group: $rgnum: " .htmlspecialchars($rg[description], ENT_QUOTES));
     $node->attribute('URL', htmlentities('/admin/config.php?display=ringgroups&view=form&extdisplay='.$rgnum));
     $node->attribute('target', '_blank');
     $node->attribute('fillcolor', $pastels[4]);
@@ -318,7 +318,7 @@ function dp_follow_destinations (&$route, $destination) {
   $another = $matches[2];
 
   $an = $route['announcements'][$annum];
-  $node->attribute('label', "Announcement: $an[description]");
+  $node->attribute('label', "Announcement: " .htmlspecialchars($an[description], ENT_QUOTES));
   $node->attribute('URL', htmlentities('/admin/config.php?display=announcement&view=form&extdisplay='.$annum));
   $node->attribute('target', '_blank');
   $node->attribute('shape', 'note');
@@ -367,7 +367,7 @@ function dp_follow_destinations (&$route, $destination) {
   $miscdestother = $matches[2];
 
   $miscdest = $route['miscdest'][$miscdestnum];
-  $node->attribute('label', "Misc Dest: $miscdest[description] ($miscdest[destdial])");
+  $node->attribute('label', "Misc Dest: " .htmlspecialchars($miscdest[description],ENT_QUOTES)." ($miscdest[destdial])");
   $node->attribute('URL', htmlentities('/admin/config.php?display=miscdests&view=form&extdisplay='.$miscdestnum));
   $node->attribute('target', '_blank');
   $node->attribute('shape', 'rpromoter');
@@ -400,7 +400,7 @@ function dp_follow_destinations (&$route, $destination) {
   $directoryother = $matches[2];
   $directory = $route['directory'][$directorynum];
 
-  $node->attribute('label', $directory['dirname']);
+  $node->attribute('label', htmlspecialchars($directory['dirname'],ENT_QUOTES));
   $node->attribute('URL', htmlentities('/admin/config.php?display=directory&view=form&id='.$directorynum));
   $node->attribute('target', '_blank');
   $node->attribute('fillcolor', $pastels[9]);
@@ -416,7 +416,7 @@ function dp_follow_destinations (&$route, $destination) {
   $disaother = $matches[2];
   $disa = $route['disa'][$disanum];
 
-  $node->attribute('label', 'DISA: '.$disa['displayname']);
+  $node->attribute('label', 'DISA: '.htmlspecialchars($disa['displayname'],ENT_QUOTES));
   $node->attribute('URL', htmlentities('/admin/config.php?display=disa&view=form&itemid='.$disanum));
   $node->attribute('target', '_blank');
   $node->attribute('fillcolor', $pastels[10]);
@@ -431,7 +431,6 @@ function dp_follow_destinations (&$route, $destination) {
   $vmtype= $matches[1];
   $vmnum = $matches[2];
   $vmother = $matches[3];
-  $vm = $route['vm'][$vmnum];
   $vm_array=array('b'=>'(Busy Message)','i'=>'(Instructions Only)','s'=>'(No Message)','u'=>'(Unavailable Message)' );
 
   $node->attribute('label', 'Voicemail: '.$vmnum.' '.$vm_array[$vmtype]);
@@ -484,7 +483,7 @@ function dp_follow_destinations (&$route, $destination) {
           $route['parent_node'] = $node;
           dp_follow_destinations($route, $d['dest']);
       }elseif ($d['dmode']=="fc_description"){
-           $node->attribute('label', "Call Flow: $d[dest]");
+           $node->attribute('label', "Call Flow: ".htmlspecialchars($d[dest],ENT_QUOTES));
       }
     }
     $daynight = $route['daynight'][$daynightnum];
@@ -496,19 +495,34 @@ function dp_follow_destinations (&$route, $destination) {
   #end of Call Flow Control (daynight)
   
   #
-  # Blackhole - hangup
+  # Feature Codes
   #
-  } elseif (preg_match("/^app-blackhole,hangup,(\d+)/", $destination, $matches)) {
-  $blackholenum = $matches[1];
-  $blackholeother = $matches[2];
-  $blackhole = $route['blackhole'][$blackholenum];
+  } elseif (preg_match("/^ext-featurecodes,(\*?\d+),(\d+)/", $destination, $matches)) {
+  $featurenum = $matches[1];
+  $featureother = $matches[2];
+  $feature = $route['featurecodes'][$featurenum];
+  
+  if ($feature['customcode']!=''){$featurenum=$feature['customcode'];}
+  $node->attribute('label', 'Feature Code: '.$feature['description'].' <'.$featurenum.'>');
+  $node->attribute('shape', 'folder');
+  $node->attribute('fillcolor', 'gainsboro');
+  $node->attribute('style', 'filled');
 
-  $node->attribute('label', 'Terminate Call: Hangup');
+  #end of Feature Codes
+  
+  #
+  # Blackhole
+  #
+  } elseif (preg_match("/^app-blackhole,(hangup|congestion|busy|zapateller|musiconhold|ring|no-service),(\d+)/", $destination, $matches)) {
+  $blackholetype = str_replace('musiconhold','Music On Hold',$matches[1]);
+  $blackholeother = $matches[2];
+  
+  $node->attribute('label', 'Terminate Call: '.ucwords($blackholetype,'-'));
   $node->attribute('shape', 'invhouse');
   $node->attribute('fillcolor', 'orangered');
   $node->attribute('style', 'filled');
 
-  #end of Blackhole - hangup
+  #end of Blackhole
 
   //preg_match not found
   } else {
@@ -727,9 +741,21 @@ function dp_load_tables(&$dproute) {
     $id = $daynight['ext'];
     $dproute['daynight'][$id][] = $daynight;
   }
+  
+  # Feature Codes
+  $query = "select * from featurecodes";
+  $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
+  if (DB::IsError($results)) {
+    die_freepbx($results->getMessage()."<br><br>Error selecting from featurecodes");
+  }
+  foreach($results as $featurecodes) {
+	$id=$featurecodes['defaultcode'];
+    $dproute['featurecodes'][$id] = $featurecodes;
+  }
 
 
 }
+
 
 function dplog($level, $msg) {
   global $dp_log_level;
