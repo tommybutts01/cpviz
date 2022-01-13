@@ -34,6 +34,6 @@ The graph is interractive.
 
 ### Issues
 * Duplicate paths are not noted on the edge text for IVRs. 
-** Example: Selection 5 and Selection 6 =  Sales Ring Group 605. Only 1 edge text is applied in this case.
+  -Example: Selection 5 and Selection 6 =  Sales Ring Group 605. Only 1 edge text is applied in this case.
 
 Please file bug reports by email to adam.volchko@gmail.com
