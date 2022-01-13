@@ -29,11 +29,9 @@ The graph is interractive.
 * Clicking on a Match:(timegroup) will open it in a new tab. 
 * Added an "Export as ... .png" button
 
-Known Issue(s):
-* Duplicate paths are not noted on the edge text for IVRs. Selection 0, Timeout, Invalid = Operator Ring Group. Only 1 edge text is applied in this case.
-
 ### License
 [This modules code is licensed as GPLv3+](http://www.gnu.org/licenses/gpl-3.0.txt)
 
 ### Issues
-Please file bug reports by email to cpviz@swcp.com
+* Duplicate paths are not noted on the edge text for IVRs. Selection 0, Timeout, Invalid = Operator Ring Group. Only 1 edge text is applied in this case.
+Please file bug reports by email to adam.volchko@gmail.com
