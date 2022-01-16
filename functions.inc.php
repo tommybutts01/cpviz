@@ -229,7 +229,9 @@ function dp_follow_destinations (&$route, $destination) {
     $iother = $matches[3];
 
     $ivr = $route['ivrs'][$inum];
-    $node->attribute('label', "IVR: ".htmlspecialchars($ivr['name'], ENT_QUOTES));
+    //featurecode to record the announcement    
+    if ($route['recordings'][$ivr['announcement']]['fcode']== '1'){$rec='\\nRecord: *29'.$ivr['announcement'];}else{$rec='\\nRecord: No';}
+    $node->attribute('label', "IVR: ".htmlspecialchars($ivr['name'].$rec, ENT_QUOTES));
     $node->attribute('URL', htmlentities('/admin/config.php?display=ivr&action=edit&id='.$inum));
     $node->attribute('target', '_blank');
     $node->attribute('shape', 'component');
@@ -318,7 +320,10 @@ function dp_follow_destinations (&$route, $destination) {
   $another = $matches[2];
 
   $an = $route['announcements'][$annum];
-  $node->attribute('label', "Announcement: " .htmlspecialchars($an[description], ENT_QUOTES));
+	  
+  //featurecode to record the announcement
+  if ($route['recordings'][$an['recording_id']]['fcode']== '1'){$rec='\\nRecord: *29'.$an['recording_id'];}else{$rec='\\nRecord: No';}
+  $node->attribute('label', "Announcement: " .htmlspecialchars($an[description].$rec, ENT_QUOTES));
   $node->attribute('URL', htmlentities('/admin/config.php?display=announcement&view=form&extdisplay='.$annum));
   $node->attribute('target', '_blank');
   $node->attribute('shape', 'note');
@@ -753,6 +758,16 @@ function dp_load_tables(&$dproute) {
     $dproute['featurecodes'][$id] = $featurecodes;
   }
 
+  # Recordings
+  $query = "select * from recordings";
+  $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
+  if (DB::IsError($results)) {
+    die_freepbx($results->getMessage()."<br><br>Error selecting from featurecodes");
+  }
+  foreach($results as $recordings) {
+	$id=$recordings['id'];
+    $dproute['recordings'][$id] = $recordings;
+  }
 
 }
 
