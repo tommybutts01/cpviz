@@ -229,9 +229,18 @@ function dp_follow_destinations (&$route, $destination) {
     $iother = $matches[3];
 
     $ivr = $route['ivrs'][$inum];
-    //featurecode to record the announcement    
-    if ($route['recordings'][$ivr['announcement']]['fcode']== '1'){$rec='\\nRecord: *29'.$ivr['announcement'];}else{$rec='\\nRecord: No';}
-    $node->attribute('label', "IVR: ".htmlspecialchars($ivr['name'].$rec, ENT_QUOTES));
+	  
+    //feature code exist?
+    if ( isset($route['featurecodes']['*29'.$ivr['announcement']]) ){
+      //custom feature code?
+      if ($route['featurecodes']['*29'.$ivr['announcement']]['customcode']!=''){$featurenum=$route['featurecodes']['*29'.$ivr['announcement']]['customcode'];}else{$featurenum=$route['featurecodes']['*29'.$ivr['announcement']]['defaultcode'];}
+      //is it enabled?
+      if ( ($route['recordings'][$ivr['announcement']]['fcode']== '1') && ($route['featurecodes']['*29'.$ivr['announcement']]['enabled']=='1') ){$rec='\\nRecord(yes): '.$featurenum;}else{$rec='\\nRecord(no): '.$featurenum;}
+    }else{
+      $rec='\\nRecord(no): disabled';
+    }
+	  
+    $node->attribute('label', "IVR: ".htmlspecialchars($ivr['name'], ENT_QUOTES).$rec);
     $node->attribute('URL', htmlentities('/admin/config.php?display=ivr&action=edit&id='.$inum));
     $node->attribute('target', '_blank');
     $node->attribute('shape', 'component');
@@ -320,10 +329,18 @@ function dp_follow_destinations (&$route, $destination) {
   $another = $matches[2];
 
   $an = $route['announcements'][$annum];
-	  
-  //featurecode to record the announcement
-  if ($route['recordings'][$an['recording_id']]['fcode']== '1'){$rec='\\nRecord: *29'.$an['recording_id'];}else{$rec='\\nRecord: No';}
-  $node->attribute('label', "Announcement: " .htmlspecialchars($an[description].$rec, ENT_QUOTES));
+
+  //feature code exist?
+  if ( isset($route['featurecodes']['*29'.$an['recording_id']]) ){
+    //custom feature code?
+    if ($route['featurecodes']['*29'.$an['recording_id']]['customcode']!=''){$featurenum=$route['featurecodes']['*29'.$an['recording_id']]['customcode'];}else{$featurenum=$route['featurecodes']['*29'.$an['recording_id']]['defaultcode'];}
+    //is it enabled?
+    if ( ($route['recordings'][$an['recording_id']]['fcode']== '1') && ($route['featurecodes']['*29'.$an['recording_id']]['enabled']=='1') ){$rec='\\nRecord(yes): '.$featurenum;}else{$rec='\\nRecord(no): '.$featurenum;}
+  }else{
+    $rec='\\nRecord(no): disabled';
+  }
+
+  $node->attribute('label', "Announcement: " .htmlspecialchars($an[description], ENT_QUOTES).$rec);
   $node->attribute('URL', htmlentities('/admin/config.php?display=announcement&view=form&extdisplay='.$annum));
   $node->attribute('target', '_blank');
   $node->attribute('shape', 'note');
@@ -508,7 +525,9 @@ function dp_follow_destinations (&$route, $destination) {
   $feature = $route['featurecodes'][$featurenum];
   
   if ($feature['customcode']!=''){$featurenum=$feature['customcode'];}
-  $node->attribute('label', 'Feature Code: '.$feature['description'].' <'.$featurenum.'>');
+  $node->attribute('label', 'Feature Code: '.htmlspecialchars($feature['description'],ENT_QUOTES).' <'.$featurenum.'>');
+  $node->attribute('URL', htmlentities('/admin/config.php?display=featurecodeadmin'));
+  $node->attribute('target', '_blank');
   $node->attribute('shape', 'folder');
   $node->attribute('fillcolor', 'gainsboro');
   $node->attribute('style', 'filled');
