@@ -192,7 +192,7 @@ function dp_follow_destinations (&$route, $destination) {
     $qother = $matches[2];
 
     $q = $route['queues'][$qnum];
-    if ($q['maxwait']>=60){$maxwait=($q['maxwait'] / 60).' mins';}elseif($q['maxwait']==0){$maxwait='Unlimited';}else{$maxwait=$q['maxwait'].' secs';}
+    if($q['maxwait']==0){$maxwait='Unlimited';}else{$maxwait=secondsToTime($q['maxwait']);}
     $node->attribute('label', "Queue $qnum: ".htmlspecialchars($q['descr'],ENT_QUOTES));
     $node->attribute('URL', htmlentities('/admin/config.php?display=queues&view=form&extdisplay='.$qnum));
     $node->attribute('target', '_blank');
@@ -287,7 +287,6 @@ function dp_follow_destinations (&$route, $destination) {
     $rgother = $matches[2];
 
     $rg = $route['ringgroups'][$rgnum];
-    if ($rg['grptime']>=60){$rgmaxwait=($rg['grptime'] / 60).' mins';}else{$rgmaxwait=$rg['grptime'].' secs';}
     $node->attribute('label', "Ring Group: $rgnum: " .htmlspecialchars($rg[description], ENT_QUOTES));
     $node->attribute('URL', htmlentities('/admin/config.php?display=ringgroups&view=form&extdisplay='.$rgnum));
     $node->attribute('target', '_blank');
@@ -297,7 +296,7 @@ function dp_follow_destinations (&$route, $destination) {
     # The destinations we need to follow are the no-answer destination
     # (postdest) and the members of the group.
     if ($rg['postdest'] != '') {
-      $route['parent_edge_label'] = ' No Answer ('.$rgmaxwait.')';
+      $route['parent_edge_label'] = ' No Answer ('.secondsToTime($rg['grptime']).')';
       $route['parent_node'] = $node;
       dp_follow_destinations($route, $rg['postdest']);
     }
@@ -806,6 +805,13 @@ function dplog($level, $msg) {
   fwrite($fd, $ts . "  " . $msg . "\n");
   fclose($fd);
   return;
+}
+
+function secondsToTime($seconds){
+  $hours = floor($seconds / 3600);
+  $minutes = floor(($seconds / 60) % 60);
+  $seconds = $seconds % 60;
+  return $hours > 0 ? "$hours hrs, $minutes mins" : ($minutes > 0 ? "$minutes mins, $seconds secs" : "$seconds secs");
 }
 
 ?>
