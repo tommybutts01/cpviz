@@ -43,8 +43,10 @@ if ($inroutes){
 }else{
 	$html_txt .= "<option>No Routes Found</option>\n";
 }
+if ($_POST['direction']=='LR'){$checked='checked';}
 $html_txt .= "</datalist>\n";
 $html_txt .= "<input name=\"Submit\" type=\"submit\" value=\"Visualize Dial Plan\">\n";
+$html_txt .= "<input type=\"checkbox\" id=\"LR\" name=\"direction\" value=\"LR\" $checked><label for=\"LR\">&nbsp;Horizontal</label>&nbsp;&nbsp;\n";
 $html_txt .= "</form>\n";
 
 //$graphPath="/tmp/graph.png";
@@ -55,7 +57,7 @@ $html_txt .= "</form>\n";
 // happens, it looks ugly like something went really wrong.
 //$iroute = '5052327992';
 if ($iroute != '') {
-print_r($dproute);
+
   $dproute = dp_find_route($inroutes, $iroute);
   if (empty($dproute)) {
     $html_txt .= "<h2>Error: Could not find inbound route for '$iroute'</h2>\n";
@@ -70,7 +72,8 @@ print_r($dproute);
     dplog(5, "Doing follow dest ...");
     dp_follow_destinations($dproute, '');
     dplog(5, "Finished follow dest ...");
-
+	  
+    $gtext = $dproute['dpgraph']->attr('graph',array('rankdir'=>$_POST['direction']));
     $gtext = $dproute['dpgraph']->render();
 	//file_put_contents($graphPath, $dproute['dpgraph']->fetch('png'));
 //  $html_txt .= "<pre>\n" . "Dial Plan Graph for formatPhoneNumber($iroute):\n$gtext" . "\n</pre><br>\n";
