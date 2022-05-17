@@ -208,18 +208,18 @@ function dp_follow_destinations (&$route, $destination) {
       dp_follow_destinations($route, $q['dest']);
     }
 
-    if (!empty($q['members'])){ksort($q['members']);
-    foreach ($q['members'] as $member => $qstatus) {
-      dplog(9, "queue member $member / $qstatus ...");
-      if ($qstatus == 'static') {
-        $route['parent_edge_label'] = ' Static Member';
-      } else {
-        $route['parent_edge_label'] = ' Dynamic Member';
-      }
-      $route['parent_node'] = $node;
-      dp_follow_destinations($route, $member);
-    }
-}
+	if (!empty($q['members'])){ksort($q['members']);
+		foreach ($q['members'] as $member => $qstatus) {
+			dplog(9, "queue member $member / $qstatus ...");
+			if ($qstatus == 'static') {
+				$route['parent_edge_label'] = ' Static Member';
+			} else {
+				$route['parent_edge_label'] = ' Dynamic Member';
+			}
+			$route['parent_node'] = $node;
+			dp_follow_destinations($route, $member);
+		}
+	}
   #
   # IVRs
   #
@@ -619,7 +619,17 @@ function dp_load_tables(&$dproute) {
     }
   }
 
-
+	# Users
+  $query = "select * from users";
+  $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
+  if (DB::IsError($results)) {
+    die_freepbx($results->getMessage()."<br><br>Error selecting from users");
+  }
+	
+  foreach($results as $users) {
+    $id = $users['extension'];
+		$u[$id]= $users;
+  }
   # Queues
   $query = "select * from queues_config";
   $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
@@ -796,7 +806,6 @@ function dp_load_tables(&$dproute) {
 	$id=$recordings['id'];
     $dproute['recordings'][$id] = $recordings;
   }
-
 }
 
 
