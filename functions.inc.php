@@ -308,7 +308,7 @@ function dp_follow_destinations (&$route, $destination) {
       if (preg_match("/^\d+/", $member)) {
 				//$extname= 
 				
-        dp_follow_destinations($route, "$member\\n$name");
+        dp_follow_destinations($route, "Ext$member\\n$name");
       } elseif (preg_match("/#$/", $member)) {
         preg_replace("/[^0-9]/", '', $member);   // remove non-digits
         if (preg_match("/^(\d\d\d)(\d\d\d\d)$/", $member, $matches)) {
