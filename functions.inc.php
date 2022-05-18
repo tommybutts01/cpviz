@@ -208,18 +208,18 @@ function dp_follow_destinations (&$route, $destination) {
       dp_follow_destinations($route, $q['dest']);
     }
 
-	if (!empty($q['members'])){ksort($q['members']);
-		foreach ($q['members'] as $member => $qstatus) {
-			dplog(9, "queue member $member / $qstatus ...");
-			if ($qstatus == 'static') {
-				$route['parent_edge_label'] = ' Static Member';
-			} else {
-				$route['parent_edge_label'] = ' Dynamic Member';
+    if (!empty($q['members'])){ksort($q['members']);
+			foreach ($q['members'] as $member => $qstatus) {
+				dplog(9, "queue member $member / $qstatus ...");
+				if ($qstatus == 'static') {
+					$route['parent_edge_label'] = ' Static Member';
+				} else {
+					$route['parent_edge_label'] = ' Dynamic Member';
+				}
+				$route['parent_node'] = $node;
+				dp_follow_destinations($route, $member);
 			}
-			$route['parent_node'] = $node;
-			dp_follow_destinations($route, $member);
 		}
-	}
   #
   # IVRs
   #
@@ -302,11 +302,13 @@ function dp_follow_destinations (&$route, $destination) {
     }
 
     ksort($rg['members']);
-    foreach ($rg['members'] as $member => $junk) {
+    foreach ($rg['members'] as $member => $name) {
       $route['parent_edge_label'] = ' RG Member';
       $route['parent_node'] = $node;
       if (preg_match("/^\d+/", $member)) {
-        dp_follow_destinations($route, "Ext$member");
+				//$extname= 
+				
+        dp_follow_destinations($route, "$member\\n$name");
       } elseif (preg_match("/#$/", $member)) {
         preg_replace("/[^0-9]/", '', $member);   // remove non-digits
         if (preg_match("/^(\d\d\d)(\d\d\d\d)$/", $member, $matches)) {
@@ -468,7 +470,7 @@ function dp_follow_destinations (&$route, $destination) {
   #
   } elseif (preg_match("/^from-did-direct,(\d+),(\d+)/", $destination, $matches)) {
   $extnum = $matches[1];
-  $extother = $matches[2];
+	$extother = $matches[2];
   $ext = $route['vm'][$vmnum];
   
   $node->attribute('label', 'Extension: '.$extnum);
@@ -630,6 +632,7 @@ function dp_load_tables(&$dproute) {
     $id = $users['extension'];
 		$u[$id]= $users;
   }
+	
   # Queues
   $query = "select * from queues_config";
   $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
@@ -640,12 +643,13 @@ function dp_load_tables(&$dproute) {
     $id = $q['extension'];
     $dproute['queues'][$id] = $q;
   }
+	
 
   # Queue members
   $query = "select * from queues_details";
   $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
   if (DB::IsError($results)) {
-    die_freepbx($results->getMessage()."<br><br>Error selecting from timegroups_details");       
+    die_freepbx($results->getMessage()."<br><br>Error selecting from queues_details");       
   }
   foreach($results as $qd) {
     $id = $qd['id'];
@@ -653,16 +657,17 @@ function dp_load_tables(&$dproute) {
       $member = $qd['data'];
       if (preg_match("/Local\/(\d+)/", $member, $matches)) {
         $enum = $matches[1];
-        $dproute['queues'][$id]['members']["Ext$enum"] = 'static';
+				$name_ext='Ext'.$enum.'\\n'.$u[$enum]['name'];
+				$dproute['queues'][$id]['members'][$name_ext] = 'static';
       }
     }
   }
-
+	
   # IVRs
   $query = "select * from ivr_details";
   $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
   if (DB::IsError($results)) {
-    die_freepbx($results->getMessage()."<br><br>Error selecting from timegroups_details");       
+    die_freepbx($results->getMessage()."<br><br>Error selecting from ivr_details");       
   }
   foreach($results as $ivr) {
     $id = $ivr['id'];
@@ -673,7 +678,7 @@ function dp_load_tables(&$dproute) {
   $query = "select * from ivr_entries";
   $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
   if (DB::IsError($results)) {
-    die_freepbx($results->getMessage()."<br><br>Error selecting from timegroups_details");       
+    die_freepbx($results->getMessage()."<br><br>Error selecting from ivr_entries");       
   }
   foreach($results as $ent) {
     $id = $ent['ivr_id'];
@@ -686,7 +691,7 @@ function dp_load_tables(&$dproute) {
   $query = "select * from ringgroups";
   $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
   if (DB::IsError($results)) {
-    die_freepbx($results->getMessage()."<br><br>Error selecting from timegroups_details");       
+    die_freepbx($results->getMessage()."<br><br>Error selecting from ringgroups");       
   }
   foreach($results as $rg) {
     $id = $rg['grpnum'];
@@ -694,7 +699,7 @@ function dp_load_tables(&$dproute) {
     $dests = preg_split("/-/", $rg['grplist']);
     foreach ($dests as $dest) {
       dplog(9, "rg dest:  rg=$id   dest=$dest");
-      $dproute['ringgroups'][$id]['members'][$dest] = 1;
+      $dproute['ringgroups'][$id]['members'][$dest] = $u[$dest]['name'];
     }
   }
 
@@ -702,7 +707,7 @@ function dp_load_tables(&$dproute) {
   $query = "select * from announcement";
   $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
   if (DB::IsError($results)) {
-    die_freepbx($results->getMessage()."<br><br>Error selecting from announcements");       
+    die_freepbx($results->getMessage()."<br><br>Error selecting from announcement");       
   }
   foreach($results as $an) {
     $id = $an['announcement_id'];
