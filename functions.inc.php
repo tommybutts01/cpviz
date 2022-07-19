@@ -381,6 +381,29 @@ function dp_follow_destinations (&$route, $destination) {
   }
 
   #end of Set CID
+  
+  #
+  # Languages
+  #
+  } elseif (preg_match("/^app-languages,(\d+),(\d+)/", $destination, $matches)) {
+  $langnum = $matches[1];
+  $langother = $matches[2];
+
+  $lang = $route['languages'][$langnum];
+  $node->attribute('label', 'Languages: '.$lang['description']);
+  $node->attribute('URL', htmlentities('/admin/config.php?display=languages&view=form&extdisplay='.$langnum));
+  $node->attribute('target', '_blank');
+  $node->attribute('shape', 'note');
+  $node->attribute('fillcolor', $pastels[6]);
+  $node->attribute('style', 'filled');
+
+  if ($lang['dest'] != '') {
+    $route['parent_edge_label'] = ' Continue';
+    $route['parent_node'] = $node;
+    dp_follow_destinations($route, $lang['dest']);
+  }
+
+  #end of Languages
 
   #
   # MISC Destinations
@@ -726,9 +749,6 @@ function dp_load_tables(&$dproute) {
   foreach($results as $cid) {
     $id = $cid['cid_id'];
     $dproute['setcid'][$id] = $cid;
-    $dest = $cid['dest'];
-    dplog(9, "cid dest:  setcid=$id   dest=$dest");
-    $dproute['setcid'][$id]['dest'] = $dest;
   }
 
   # Misc Destinations
@@ -810,6 +830,17 @@ function dp_load_tables(&$dproute) {
   foreach($results as $recordings) {
 	$id=$recordings['id'];
     $dproute['recordings'][$id] = $recordings;
+  }
+	
+  # Languages
+  $query = "select * from languages";
+  $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
+  if (DB::IsError($results)) {
+    die_freepbx($results->getMessage()."<br><br>Error selecting from languages");
+  }
+  foreach($results as $languages) {
+	$id=$languages['language_id'];
+    $dproute['languages'][$id] = $languages;
   }
 }
 
