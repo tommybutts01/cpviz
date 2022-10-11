@@ -367,7 +367,7 @@ function dp_follow_destinations (&$route, $destination) {
   $cidother = $matches[2];
 
   $cid = $route['setcid'][$cidnum];
-  $node->attribute('label', 'Set CID: '.preg_replace('/\${CALLERID\(name\)}/i', '_____', $cid['cid_name']));
+  $node->attribute('label', 'Set CID\nName= '.preg_replace('/\${CALLERID\(name\)}/i', '$cid_name', $cid['cid_name']).'\nNumber= '.preg_replace('/\${CALLERID\(num\)}/i', '$cid_number', $cid['cid_num']));
   $node->attribute('URL', htmlentities('/admin/config.php?display=setcid&view=form&id='.$cidnum));
   $node->attribute('target', '_blank');
   $node->attribute('shape', 'note');
