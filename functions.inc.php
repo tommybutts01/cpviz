@@ -477,8 +477,11 @@ function dp_follow_destinations (&$route, $destination) {
   $vmtype= $matches[1];
   $vmnum = $matches[2];
   $vmother = $matches[3];
+  
   $vm_array=array('b'=>'(Busy Message)','i'=>'(Instructions Only)','s'=>'(No Message)','u'=>'(Unavailable Message)' );
-
+  $emailadd= $route['extensions'][$vmnum]['name'].'\\n'.$route['extensions'][$vmnum]['email'];
+ 
+  $node->attribute('label', 'Voicemail: '.$vmnum.': '.$emailadd.'\\n'.$vm_array[$vmtype]);
   $node->attribute('label', 'Voicemail: '.$vmnum.' '.$vm_array[$vmtype]);
   $node->attribute('URL', htmlentities('/admin/config.php?display=extensions&extdisplay='.$vmnum));
   $node->attribute('target', '_blank');
@@ -653,7 +656,25 @@ function dp_load_tables(&$dproute) {
 	
   foreach($results as $users) {
     $id = $users['extension'];
-		$u[$id]= $users;
+    $u[$id]= $users;
+    $dproute['extensions'][$id]= $users;
+  }
+
+# Userman
+  $query = "select * from userman_users";
+  $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
+  if (DB::IsError($results)) {
+    die_freepbx($results->getMessage()."<br><br>Error selecting from userman_users");
+  }
+	
+  foreach($results as $userman) {
+	  
+	  $id = $userman['username'];
+	  if ($userman['email']!=''){
+		  $dproute['extensions'][$id]['email'] = $userman['email'];
+	  }else{
+		  $dproute['extensions'][$id]['email'] = 'unassigned';
+	  }
   }
 	
   # Queues
