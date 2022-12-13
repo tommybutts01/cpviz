@@ -12,6 +12,7 @@
     <cpviz>Dial Plan Visualizer</cpviz>
   </menuitems>
 	<changelog>
+		*1.0.11* AdamV Updated name and email for Voicemail
 		*1.0.10* AdamV expanded on initial
 		*1.0.8* First fully working release
 		*1.0.0* First release, testing module creation 
