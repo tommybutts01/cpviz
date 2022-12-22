@@ -404,7 +404,26 @@ function dp_follow_destinations (&$route, $destination) {
   }
 
   #end of Languages
+  #Custom Destinations
+  #
+  } elseif (preg_match("/customdests,([a-z-]+(\d+)),(\d+)/", $destination, $matches)) {
+  $custdestnum = $matches[2];
+  $custdestother = $matches[3];
 
+
+  $custdest = $route['customdest'][$custdestnum];
+  $node->attribute('label', $custdest['description']);
+  $node->attribute('URL', htmlentities('/admin/config.php?display=customdests&view=form&destid='.$custdestnum));
+  $node->attribute('target', '_blank');
+  $node->attribute('shape', 'note');
+  $node->attribute('fillcolor', 'coral');
+  $node->attribute('style', 'filled');
+
+  if ($custdest['dest'] != '') {
+    $route['parent_edge_label'] = ' Continue';
+    $route['parent_node'] = $node;
+    dp_follow_destinations($route, $custdest['dest']);
+  }
   #
   # MISC Destinations
   #
@@ -862,6 +881,21 @@ function dp_load_tables(&$dproute) {
   foreach($results as $languages) {
 	$id=$languages['language_id'];
     $dproute['languages'][$id] = $languages;
+  }
+  # Custom Destinations
+  $query = "select * from kvstore_FreePBX_modules_Customappsreg";
+  $results = $db->getAll($query, DB_FETCHMODE_ASSOC);
+  if (DB::IsError($results)) {
+    die_freepbx($results->getMessage()."<br><br>Error selecting from Custom Destinations");
+  }
+
+  foreach($results as $customdest) {
+        $val=json_decode($customdest['val']);
+        $id=$val->destid;
+        $customdest['id'] = $id;
+        $customdest['description'] = $val->description;
+        $customdest['dest'] = $val->dest;
+        $dproute['customdest'][$id] = $customdest;
   }
 }
 
